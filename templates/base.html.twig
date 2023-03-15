@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+{% set menus = menu_service.findAll %}
+ <!DOCTYPE html>
 <html lang = 'fr' >
     <head>
         <meta charset="UTF-8">
@@ -23,7 +24,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{path ('admin')}}">Tableau de bord</a></li>
-                        <li><a class="dropdown-item" href="#">Menus</a></li>
+                        <li><a class="dropdown-item" href="{{ ea_index ('MenuCrudController')}}">Menus</a></li>
                     </ul>
                 </div>
 
@@ -46,6 +47,27 @@
                         </a>
 
                         <ul class='nav nav-pills'>
+
+                            {% for menu in menus %}
+                                {% if menu.subMenus.count > 0 %}
+                                <div class="dropdown">
+                                    <a class="nav nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        {{menu.name}}
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        {% for subMenu in menu.subMenus %}
+                                             <li><a class="dropdown-item" href='{{subMenu| menuLink}} '>{{subMenu.name}}</a></li>                                            
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% else %}
+                                    <li class="nav-item">
+                                        <a href="{{menu| menuLink}}" class="nav-link text-dark">{{menu.name}}</a>
+                                    </li>                                
+                                {% endif %}                                
+                            {% endfor %}
+
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark"  href="#">S'incrire</a>
                             </li>
@@ -54,7 +76,7 @@
                             </li>
                         </ul>
                     </header>
-                 </div>
+        </div>
         {% block body %}{% endblock %}
         <div class="container">
             <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">

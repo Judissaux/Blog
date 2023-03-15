@@ -3,23 +3,113 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Menu;
+use App\Repository\MenuRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class MenuCrudController extends AbstractCrudController
-{
+{   
+
+    const MENU_PAGES = 0;
+    const MENU_ARTICLES = 1;
+    const MENU_LINKS = 2;
+    const MENU_CATEGORIES = 3;
+
+    public function __construct(private RequestStack $requestStack, Private MenuRepository $menuRepo){}
+
     public static function getEntityFqcn(): string
     {
         return Menu::class;
     }
 
-    /*
+    // Fonction qui génére la requête qui recherche les différents menus
+    public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+    {
+        $subMenuIndex = $this->getSubMenuIndex();
+
+        return $this->menuRepo->getIndexQueryBuilder($this->getFieldNameFromSubMenuIndex($subMenuIndex));
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        $subMenuIndex = $this->getSubMenuIndex();
+        
+        // PERMET DE MODIFIER LE NOM DU BOUTON
+        $entityLabelInSingular = 'un menu';
+
+        // PERMET DE MODIFIER LES CHAMPS DE CHAQUE HAUT DE PAGE
+        $entityLabelInPlural = match ($subMenuIndex) {
+            self::MENU_ARTICLES => 'Articles',
+            self::MENU_CATEGORIES => 'Catégories',
+            self::MENU_LINKS=> 'Liens personnalisés',
+            default => 'Pages'
+        };
+
+        return $crud
+            ->setEntityLabelInSingular($entityLabelInSingular)
+            ->setEntityLabelInPlural($entityLabelInPlural);
+    }
+   
+ 
+    
+    
     public function configureFields(string $pageName): iterable
     {
-        return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
-        ];
+        $subMenuIndex = $this->getSubMenuIndex();
+
+        // Decomposition "yield typedechamp::new('nomdelavariabledansl'entité , label")
+       yield TextField::new('name', 'Titre de la navigation');
+
+       yield NumberField::new('menuOrder', 'Ordre');
+       
+       yield $this->getFieldFromSubMenuIndex($subMenuIndex)
+        ->setRequired(true);
+
+       yield BooleanField::new('isVisible', 'Visible');
+
+       yield AssociationField::new('subMenus', 'Sous-élément');
     }
-    */
+
+
+    private function getFieldNameFromSubMenuIndex(int $subMenuIndex)
+    {
+            return  match ($subMenuIndex) {
+                self::MENU_ARTICLES => 'article',
+                self::MENU_CATEGORIES => 'category',
+                self::MENU_LINKS=> 'link',
+                default => 'page'
+            };
+    }
+
+    // FONCTION QUI PERMET D'AVOIR SOI UN TEXTFIELD SI IL Y A UN LIEN A METTRE SINON UN ASSOCIATION FIELD
+    private function getFieldFromSubMenuIndex(int $subMenuIndex)
+    {
+        $fieldName = $this->getFieldNameFromSubMenuIndex($subMenuIndex);
+
+        return ($fieldName == 'link') ? TextField::new($fieldName,'Lien') : AssociationField::new($fieldName);
+    }
+    
+
+    private function getSubMenuIndex(): int
+    {
+        $url = $this->requestStack->getMainRequest()->query->all();
+        foreach ($url as $key => $value) {
+            if( 'referrer' === $key){
+                $val = strstr($value, 'submenuIndex');
+                $val = substr($val,13);
+                return $val;
+            }
+        }
+        return $this->requestStack->getMainRequest()->query->getInt('submenuIndex');
+    }
 }

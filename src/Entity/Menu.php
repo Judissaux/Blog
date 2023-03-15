@@ -16,7 +16,7 @@ class Menu
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $nale = null;
+    private ?string $name = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $menuOrder = null;
@@ -49,14 +49,14 @@ class Menu
         return $this->id;
     }
 
-    public function getNale(): ?string
+    public function getName(): ?string
     {
-        return $this->nale;
+        return $this->name;
     }
 
-    public function setNale(string $nale): self
+    public function setName(string $name): self
     {
-        $this->nale = $nale;
+        $this->name = $name;
 
         return $this;
     }
@@ -155,5 +155,10 @@ class Menu
         $this->link = $link;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }
