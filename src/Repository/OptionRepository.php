@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Option;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,5 +33,20 @@ class OptionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
         ;
+    }
+
+    public function getValue(string $name): mixed
+    {
+        try{
+            return $this->createQueryBuilder('o')
+                ->select('o.value')
+                ->where('o.name = :name')
+                ->setParameter(':name' , $name)
+                ->getQuery()
+                ->getSingleScalarResult();
+            
+        }catch (NoResultException|NonUniqueResultException){
+            return null;
+        }
     }
 }
