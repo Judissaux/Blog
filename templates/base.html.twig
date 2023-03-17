@@ -15,6 +15,8 @@
         {% endblock %}
     </head>
     <body>
+    {% if is_granted('ROLE_AUTHOR') %}
+   
        <nav class="py-2 bg-dark border-bottom">
             <div class="container d-flex flex-wrap">
 
@@ -24,7 +26,9 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{path ('admin')}}">Tableau de bord</a></li>
-                        <li><a class="dropdown-item" href="{{ ea_index ('MenuCrudController')}}">Menus</a></li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <li><a class="dropdown-item" href="{{ ea_gen_url ('MenuCrudController')}}">Menus</a></li>
+                        {% endif %}
                     </ul>
                 </div>
 
@@ -33,13 +37,14 @@
                         Ajouter
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Article</a></li>
-                        <li><a class="dropdown-item" href="#">Page</a></li>
+                        <li><a class="dropdown-item" href="{{ea_gen_url ('ArticleCrudController', 'new')}}">Article</a></li>
+                        <li><a class="dropdown-item" href="{{ea_gen_url ('PageCrudController', 'new')}}">Page</a></li>
                     </ul>
                 </div>  
 
             </div>
        </nav>
+       {% endif %}
          <div class="container">
                     <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
                         <a class='d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none' href="{{path ('app_home')}}">
@@ -67,14 +72,29 @@
                                 {% endif %}                                
                             {% endfor %}
 
-
+                            {% if not is_granted('IS_AUTHENTICATED_FULLY') %}                            
                             <li class="nav-item">
-                                <a class="nav-link text-dark"  href="#">S'incrire</a>
+                                <a class="nav-link text-dark"  href="{{path ('app_register')}}">S'incrire</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark"  href="#">Se connecter</a>
+                                <a class="nav-link text-dark"  href="{{path ('app_login')}}">Se connecter</a>
                             </li>
+                            {% else %}
+                            <div class="dropdown">
+                                <a class="nav nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{app.user.username|capitalize}}                                
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path ('app_profile' , {username: app.user.username}) }}">Mon profil</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{path ('app_logout')}}" class="dropdown-item">Déconnexion</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </ul>
+                        {% endif %}
                     </header>
         </div>
         {% block body %}{% endblock %}

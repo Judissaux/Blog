@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Article;
+use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,46 +23,17 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
-    public function save(Article $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
+   public function findForPagination(?Category $category = null): Query
+   {
+        $qb = $this->createQueryBuilder('a')
+            ->OrderBy('a.createdAt', 'DESC');
+        
+            if($category){
+                $qb->leftJoin('a.categories', 'c')
+                   ->where($qb->expr()->eq('c.id' , ':categoryId'))
+                   ->setParameter('categoryId', $category->getId());                   
+            }
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Article $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-//    /**
-//     * @return Article[] Returns an array of Article objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Article
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+            return $qb->getQuery();
+   }
 }

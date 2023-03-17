@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\OptionRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\OptionRepository;
 
 #[ORM\Entity(repositoryClass: OptionRepository::class)]
 #[ORM\Table(name: '`option`')]
@@ -17,14 +18,29 @@ class Option
     #[ORM\Column(length: 255)]
     private ?string $label = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $value = null;
 
     #[ORM\Column(length: 255)]
     private ?string $type = null;
+
+    
+    /**
+     * @param $label
+     * @param $name
+     * @param $value
+     * @param $type
+     */
+    public function __construct($label,$name,$value,$type)
+    {
+        $this->label = $label;
+        $this->name = $name;
+        $this->value = $value;
+        $this->type= $type;
+    }
 
     public function getId(): ?int
     {
