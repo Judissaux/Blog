@@ -20,7 +20,7 @@ class CommentController extends AbstractController
     #[Route('/ajax/comments', name: 'comment_add')]
     public function add(Request $request,CommentRepository $commentRepo , ArticleRepository $articleRepo, EntityManagerInterface $em, UserRepository $userRepo): Response
     {       
-        
+        // Ici on récupére les données émise par le formulaire graçe au nom donnée au formulaire dans le render 'comment'   
         $commentData = $request->request->all('comment');
 
         

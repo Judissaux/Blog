@@ -22,7 +22,7 @@ class ArticleCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
        yield TextField::new('title');
-
+       //Set targetFieldName Permet de récupérer le nom auquelle le slug est associés 
        yield SlugField::new('slug')->setTargetFieldName('title');
 
        yield TextEditorField::new('content');
@@ -32,7 +32,7 @@ class ArticleCrudController extends AbstractCrudController
        yield AssociationField::new('categories');
 
        yield AssociationField::new('featuredImage');
-       
+       //Hide on form permet de cacher le champs lors de la phase de création ou edition
        yield  DateTimeField::new('createdAt')->hideOnForm();
 
        yield DateTimeField::new('updatedAt')->hideOnForm();

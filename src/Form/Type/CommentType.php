@@ -37,7 +37,8 @@ class CommentType extends AbstractType
     }
     
     public function configureOptions(OptionsResolver $resolver)
-    {
+    {   
+        // Permet de dire que ce formulaire sera toujourds associés avec un objet de type Comment
         $resolver->setDefaults([
             'data_class' => Comment::class,
             'csrf_token_id' => 'comment-add'
