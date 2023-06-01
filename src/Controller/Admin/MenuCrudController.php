@@ -25,7 +25,9 @@ class MenuCrudController extends AbstractCrudController
     const MENU_LINKS = 2;
     const MENU_CATEGORIES = 3;
 
-    public function __construct(private RequestStack $requestStack, Private MenuRepository $menuRepo){}
+    public function __construct(
+        private RequestStack $requestStack,
+        private MenuRepository $menuRepo){}
 
     public static function getEntityFqcn(): string
     {
@@ -36,7 +38,7 @@ class MenuCrudController extends AbstractCrudController
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
         $subMenuIndex = $this->getSubMenuIndex();
-
+        // Requete permet d'avoir uniquement les menu non null sur chaque onglet
         return $this->menuRepo->getIndexQueryBuilder($this->getFieldNameFromSubMenuIndex($subMenuIndex));
     }
 
@@ -47,8 +49,9 @@ class MenuCrudController extends AbstractCrudController
         // PERMET DE MODIFIER LE NOM DU BOUTON
         $entityLabelInSingular = 'un menu';
 
-        // PERMET DE MODIFIER LES CHAMPS DE CHAQUE HAUT DE PAGE
+        // PERMET DE MODIFIER LES CHAMPS DE CHAQUE HAUT DE PAGE en utilisant la fonction "match" qui permet de comparer une exepression avec une ou plusieur condition
         $entityLabelInPlural = match ($subMenuIndex) {
+            //si submenuindex vaut 1 on écrit Article ect...
             self::MENU_ARTICLES => 'Articles',
             self::MENU_CATEGORIES => 'Catégories',
             self::MENU_LINKS=> 'Liens personnalisés',
@@ -56,7 +59,9 @@ class MenuCrudController extends AbstractCrudController
         };
 
         return $crud
+        // Modifie le label du bouton d'ajout du menu
             ->setEntityLabelInSingular($entityLabelInSingular)
+        // Modifie le label des différente page de menu dans easyAdmin
             ->setEntityLabelInPlural($entityLabelInPlural);
     }
    
@@ -64,14 +69,17 @@ class MenuCrudController extends AbstractCrudController
     
     
     public function configureFields(string $pageName): iterable
-    {
+    {   
+        // on récupére l'entier qui correspond au menu 
         $subMenuIndex = $this->getSubMenuIndex();
-
+        
+        
         // Decomposition "yield typedechamp::new('nomdelavariabledansl'entité , label")
        yield TextField::new('name', 'Titre de la navigation');
 
        yield NumberField::new('menuOrder', 'Ordre');
        
+       // on modifie le champs en fonction du menu
        yield $this->getFieldFromSubMenuIndex($subMenuIndex)
         ->setRequired(true);
 
@@ -82,8 +90,10 @@ class MenuCrudController extends AbstractCrudController
 
 
     private function getFieldNameFromSubMenuIndex(int $subMenuIndex)
-    {
+    {   
+        // Même technique qui permet de matcher une correspondance par rapport à une exigeance et de renvoyé une réponse en fonction du résultat
             return  match ($subMenuIndex) {
+                // si subMenuIndex vaut la constant menu_article qui vaut 1 alors on aura 'article'
                 self::MENU_ARTICLES => 'article',
                 self::MENU_CATEGORIES => 'category',
                 self::MENU_LINKS=> 'link',
@@ -101,15 +111,24 @@ class MenuCrudController extends AbstractCrudController
     
 
     private function getSubMenuIndex(): int
-    {
+    {   
+        // On récupérer un tableau avec en referer l'adresse
         $url = $this->requestStack->getMainRequest()->query->all();
+
+        // Partie lorsque l'on clique sur le bouton créer menu
+
         foreach ($url as $key => $value) {
+                // Lorsque l'on clique sur le bouton "créer un menu" on récupére le referer et donc l'adresse
             if( 'referrer' === $key){
+                // On récupére l'ensemble du submenuindex=?
                 $val = strstr($value, 'submenuIndex');
+                // On prend le 13 éme caracté qui correspond au chiffre
                 $val = substr($val,13);
+                // on le retourne
                 return $val;
             }
         }
-        return $this->requestStack->getMainRequest()->query->getInt('submenuIndex');
+          // Permet de récupérer le numéro aprés le submenuIndex
+          return $this->requestStack->getMainRequest()->query->getInt('submenuIndex');
     }
 }

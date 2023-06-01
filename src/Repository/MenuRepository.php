@@ -46,7 +46,7 @@ class MenuRepository extends ServiceEntityRepository
      * 
      */
     public function findAllForTwig(): array
-    {
+    {   // Requete sql qui permet de récupérer les menu qui sont coché comme visible
         return $this->createQueryBuilder('m')
             ->where('m.isVisible = true')
             ->orderBy('m.menuOrder')

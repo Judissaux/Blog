@@ -13,11 +13,11 @@ class AppExtension extends AbstractExtension
 {
     const ADMIN_NAMESPACE = 'App\Controller\Admin\\';
 
-    public function __construct(Private RouterInterface $router, private AdminUrlGenerator $adminUrlGenerator){        
-    }   
-
-
-
+    public function __construct(
+        private RouterInterface $router,
+        private AdminUrlGenerator $adminUrlGenerator)
+    {}  
+    
     public function getFilters(): array
     {
         return [
@@ -51,7 +51,7 @@ class AppExtension extends AbstractExtension
         $article = $menu->getArticle();
         $category = $menu->getCategory();
         $page = $menu->getPage();
-
+        // Si la valeur de la variable url n'est pas nul on met un #
         $url = $menu->getLink() ?: '#';
         
         if($url !== '#'){

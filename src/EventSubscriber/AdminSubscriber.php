@@ -24,7 +24,7 @@ class AdminSubscriber implements EventSubscriberInterface
     {   
         // permet de récupérer l'entité
         $entity = $event->getEntityInstance();
-        //Grace à la création de l'interfase Timestamped on peux créer une condition!
+        //Grace à la création de l'interface Timestamped on peux créer une condition!
         if(!$entity instanceof TimestampedInterface){
             return;
         }

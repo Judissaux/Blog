@@ -61,15 +61,15 @@
                                     <a class="nav nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         {{menu.name}}
                                     </a>
-                                    <ul class="dropdown-menu">
-                                        {% for subMenu in menu.subMenus %}
-                                             <li><a class="dropdown-item" href='{{subMenu| menuLink}} '>{{subMenu.name}}</a></li>                                            
+                                    <ul class="dropdown-menu">                                      
+                                        {% for subMenu in menu.subMenus %}                                      
+                                             <li><a class="dropdown-item" href='{{subMenu| menuLink}} '>{{subMenu.name}} </a></li>                                            
                                         {% endfor %}
                                     </ul>
                                 </div>
                                 {% else %}
                                     <li class="nav-item">
-                                        <a href="{{menu| menuLink}}" class="nav-link text-dark">{{menu.name}}</a>
+                                        <a href="{{menu| menuLink}}" class="nav-link text-dark">{{menu.name}} ici</a>
                                     </li>                                
                                 {% endif %}                                
                             {% endfor %}

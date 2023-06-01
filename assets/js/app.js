@@ -48,11 +48,12 @@ class App {
                 }
 
                 const json = await response.json();
-
+                // si le code json est bon
                 if(json.code == 'COMMENT_ADDED_SUCCESFULLY'){
                     const commentList = document.querySelector('.comment-list')
                     const commentCount = document.querySelector('.comment-count')
                     const commentContent = document.querySelector('#comment_content')
+                    // Permet d'insérer le contenu json
                     commentList.insertAdjacentHTML('afterbegin', json.message);
                     commentCount.innerText = json.numberOfComments;
                     commentContent.value = '';
